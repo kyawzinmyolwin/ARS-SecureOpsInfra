@@ -1,3 +1,13 @@
+resource "vault_jwt_auth_backend" "jwt_auth" {
+    description         = "Demonstration of the Terraform JWT auth backend"
+    path                = "jwt"
+    oidc_discovery_url  = "https://app.terraform.io"
+    bound_issuer        = "https://app.terraform.io"
+}
+resource "vault_policy" "admin_policy" {
+  name = "admin-policy"
+
+  policy = <<EOT
 path "auth/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
@@ -46,4 +56,24 @@ path "sys/policy/" {
 
 path "kvv2/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+}
+
+EOT
+}
+
+
+
+resource "vault_jwt_auth_backend_role" "jwt_admin_role" {
+  backend        = vault_jwt_auth_backend.jwt_auth.path
+  role_name      = "admin-role"
+  token_policies = [vault_policy.admin_policy.name]
+
+  bound_audiences   = ["vault.workload.identity"]
+  bound_claims_type = "glob"
+  bound_claims = {
+    sub = "organization:ARS-SecureOpsInfra:project:Default Project:workspace:*:run_phase:*"
+  }
+  user_claim = "terraform_full_workspace"
+  role_type  = "jwt"
+  token_ttl  = 1200
 }
