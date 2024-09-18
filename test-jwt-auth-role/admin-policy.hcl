@@ -43,3 +43,7 @@ path "sys/policy/*" {
 path "sys/policy/" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
+
+path "kv-v2/*" {
+  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+}
