@@ -1,5 +1,5 @@
 resource "vault_mount" "example" {
-  path    = "kv-v2"
+  path    = "kvv2"
   type    = "kv-v2"
   options = { version = "2" }
 }
